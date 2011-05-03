@@ -38,7 +38,7 @@ function move_to_remote(){
         mainCli::$ini['remote']['ssh_user'] = getenv('USER');
     }
 
-    $command = "rsync -e 'ssh -p " . register::$vars['coscms_main']['ssh_port'] . "' -avl ";
+    $command = "rsync -e 'ssh -p " . mainCli::$ini['remote']['ssh_port'] . "' -avl ";
     $command.= "./* "; // move all except hidden files
     $command.=
         mainCli::$ini['remote']['ssh_user'] . "@" .
@@ -55,11 +55,11 @@ function move_to_remote(){
  */
 function move_to_remote_latest_dump(){
 
-    if (empty(register::$vars['coscms_main']['ssh_user'])){
-        register::$vars['coscms_main']['ssh_user'] = getenv('USER');
+    if (empty(mainCli::$ini['remote']['ssh_user'])){
+        mainCli::$ini['remote']['ssh_user'] = getenv('USER');
     }
 
-    $command = "rsync -e 'ssh -p " . register::$vars['coscms_main']['ssh_port'] . "' -avl ";
+    $command = "rsync -e 'ssh -p " . mainCli::$ini['remote']['ssh_port'] . "' -avl ";
     $command.= "./backup/sql/* "; // move all except hidden files
     $command.=
         mainCli::$ini['remote']['ssh_user'] . "@" .
@@ -187,7 +187,7 @@ function move_to_locale(){
     // set locale public files to be owned by user
     chmod_files_to_owner();
     $command = "";
-    $command = "rsync -e 'ssh -p " . register::$vars['coscms_main']['ssh_port'] . "' -avl ";
+    $command = "rsync -e 'ssh -p " . mainCli::$ini['remote']['ssh_port'] . "' -avl ";
     $command.=
         mainCli::$ini['remote']['ssh_user'] . "@" .
         mainCli::$ini['remote']['ssh_host'] . ":" .
