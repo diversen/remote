@@ -170,7 +170,7 @@ function move_to_locale(){
 
     // create remote latest.sql
     if (!cos_confirm_readline('Locale database will be destroyed ')){
-        exit(0);
+        exit(1);
     }
 
     $command = 'ssh -p' . mainCli::$ini['remote']['ssh_port'] . ' ';
