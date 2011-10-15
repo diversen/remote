@@ -68,6 +68,18 @@ function move_to_remote_latest_dump(){
     passthru($command, $ret);
 }
 // }}}
+
+function get_ssh_production_path ($options = array()) {
+    $remote_command = mainCli::$ini['remote']['ssh_user'] . "@" .
+        mainCli::$ini['remote']['ssh_host'] . ":" .
+        mainCli::$ini['remote']['prod_path'];
+    if (isset($options['path'])) {
+        $remote_command.= $path;
+    }
+    return $remote_command;
+    
+}
+
 // {{{ load_remote()
 /**
  * function for creating latest dump,
