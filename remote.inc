@@ -16,7 +16,7 @@ function move_file_to_remote($options){
         mainCli::$ini['remote']['ssh_user'] = getenv('USER');
     }
 
-    $command = "rsync -e 'ssh -p " . register::$vars['coscms_main']['ssh_port'] . "' -avl ";
+    $command = "rsync -e 'ssh -p " . config::$vars['coscms_main']['ssh_port'] . "' -avl ";
     $command.= "$options[File] "; // move all except hidden files
     $command.=
         mainCli::$ini['remote']['ssh_user'] . "@" .
