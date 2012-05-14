@@ -1,3 +1,5 @@
+;currenct console user will be used is user is not set
+;ssh_user = 'root'
 ssh_port = 12312
 ssh_host = 123.123.123.123
 prod_path = /home/dennis/www/www.coscms.org
