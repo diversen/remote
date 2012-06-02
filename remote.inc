@@ -46,7 +46,7 @@ function remote_load_remote(){
     dump_db_file();
     remote_move_to_remote_latest_dump();
     $command = "./coscli.sh db --load-db-file ./backup/sql/latest.sql";
-    $ret = remote_system_remote($command);
+    $ret = remote_system($command);
     return $ret;
 }
 
@@ -58,8 +58,46 @@ function remote_load_remote(){
  */
 function remote_rm_files_remote(){
     $command.= "sudo ./coscli.sh file --rm";
-    return remote_system_remote($command);
+    return remote_system($command);
+}
 
+/**
+ * method for executing (passthru) a command as super user (sudo)
+ * @param string $exec_command 
+ */
+function remote_sudo_system ($exec_command) {
+    if (empty(mainCli::$ini['remote']['ssh_user'])){
+        mainCli::$ini['remote']['ssh_user'] = getenv('USER');
+    }
+    
+    $command = 'ssh -p' . mainCli::$ini['remote']['ssh_port'] . ' -t ';
+    $command.= mainCli::$ini['remote']['ssh_user'] . '@';
+    $command.= mainCli::$ini['remote']['ssh_host'] . ' ';
+    $command.= '"';
+    $command.= "cd " . mainCli::$ini['remote']['prod_path'] . " && ";
+    $command.= $exec_command;
+    $command.= '"';
+    passthru($command);  
+}
+
+function remote_fetch_files ($options) {
+    $archive = "./backup/files/latest.tar";
+    $command = "./coscli.sh backup --files-backup $archive ";
+    
+    cos_cli_print('Connecting to remote ssh server ...');
+    remote_sudo_system($command);
+    
+    $user = mainCli::$ini['remote']['ssh_user'];
+    $command = "sudo chown $user:$user $archive";
+    
+    cos_cli_print('Connecting to remote ssh server ...');
+    remote_sudo_system($command);
+    
+    $remote_path = mainCli::$ini['remote']['prod_path'];
+    $remote_path.= "/backup/files/latest.tar";
+    $locale_path = "./backup/files/latest.tar";
+    remote_rsync_locale($remote_path, $locale_path);
+    backup_files_restore(array ('File' => $archive));
 }
 
 /** 
@@ -67,7 +105,11 @@ function remote_rm_files_remote(){
  * $command.= "./coscli.sh db --dump-db-file ./backup/sql/latest.sql;";
  * @param string $exec_command 
  */
-function remote_system_remote ($exec_command) {
+function remote_system ($exec_command) {
+    if (empty(mainCli::$ini['remote']['ssh_user'])){
+        mainCli::$ini['remote']['ssh_user'] = getenv('USER');
+    }
+    
     $command = 'ssh -p' . mainCli::$ini['remote']['ssh_port'] . ' ';
     $command.= mainCli::$ini['remote']['ssh_user'] . '@';
     $command.= mainCli::$ini['remote']['ssh_host'] . ' ';
@@ -133,7 +175,7 @@ function remote_load_locale(){
     }
 
     $command = "./coscli.sh db --dump-db-file ./backup/sql/latest.sql";    
-    remote_system_remote($command);
+    remote_system($command);
 
     $remote_path = mainCli::$ini['remote']['prod_path'] . "/backup/sql/latest.sql";
     $locale_path = "./backup/sql/latest.sql";
@@ -160,7 +202,7 @@ function remote_move_to_locale(){
     }
 
     $command = "./coscli.sh db --dump-db-file ./backup/sql/latest.sql;";
-    remote_system_remote($command);
+    remote_system($command);
     chmod_files_to_owner();
     
     $remote_path = mainCli::$ini['remote']['prod_path'] . "/*";
@@ -202,6 +244,12 @@ mainCli::setOption('remote_move_to_locale', array(
 mainCli::setOption('remote_load_locale', array(
     'long_name'   => '--load-locale',
     'description' => 'Will get and load latest dump from production to locale server',
+    'action'      => 'StoreTrue'
+));
+
+mainCli::setOption('remote_fetch_files', array(
+    'long_name'   => '--fetch-files',
+    'description' => 'Will fetch remote htdocs/files and extract to locale',
     'action'      => 'StoreTrue'
 ));
 
