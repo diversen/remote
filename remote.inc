@@ -84,19 +84,23 @@ function remote_fetch_files ($options) {
     $archive = "./backup/files/latest.tar";
     $command = "./coscli.sh backup --files-backup $archive ";
     
-    cos_cli_print('Connecting to remote ssh server ...');
+    cos_cli_print('Connecting to remote ssh server. Will create archive ...');
     remote_sudo_system($command);
     
     $user = mainCli::$ini['remote']['ssh_user'];
     $command = "sudo chown $user:$user $archive";
     
-    cos_cli_print('Connecting to remote ssh server ...');
+    cos_cli_print('Connecting to remote ssh server. Will chown of archive ...');
     remote_sudo_system($command);
     
     $remote_path = mainCli::$ini['remote']['prod_path'];
     $remote_path.= "/backup/files/latest.tar";
     $locale_path = "./backup/files/latest.tar";
+    
+    cos_cli_print('Fetching remote archive with rsync  ...');
     remote_rsync_locale($remote_path, $locale_path);
+    
+    cos_cli_print('Extracting rsynced archive with tar  ...');
     backup_files_restore(array ('File' => $archive));
 }
 
