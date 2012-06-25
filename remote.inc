@@ -222,13 +222,13 @@ mainCli::setCommand('remote', array(
 ));
 
 mainCli::setOption('remote_move_to_remote', array(
-    'long_name'   => '--move-to-remote',
-    'description' => 'Will move complete source tree to remote ssh server',
+    'long_name'   => '--push',
+    'description' => 'Will push complete source tree to remote ssh server',
     'action'      => 'StoreTrue'
 ));
 
 mainCli::setOption('remote_move_file_to_remote', array(
-    'long_name'   => '--move-file-to-remote',
+    'long_name'   => '--single-push',
     'description' => 'Will move single specified file to remote ssh server',
     'action'      => 'StoreTrue'
 ));
@@ -240,8 +240,8 @@ mainCli::setOption('remote_load_remote', array(
 ));
 
 mainCli::setOption('remote_move_to_locale', array(
-    'long_name'   => '--move-to-locale',
-    'description' => 'Will get remote file and latest sql from production to locale server',
+    'long_name'   => '--pull',
+    'description' => 'Will pull complete source tree and files to locale server',
     'action'      => 'StoreTrue'
 ));
 
@@ -259,6 +259,6 @@ mainCli::setOption('remote_fetch_files', array(
 
 mainCli::setArgument(
     'File',
-    array('description'=> 'Specify filename to be moved',
+    array('description'=> 'Specify single file to be moved',
         'optional' => true,
 ));
