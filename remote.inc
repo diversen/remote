@@ -5,10 +5,11 @@
  */
 function remote_move_file_to_remote($options){
 
+    $prod_path = mainCli::$ini['remote']['prod_path'];
     if (!isset($options['File'])){
         cos_cli_abort('You need to specify file to move');
     }
-    remote_rsync_remote($options['File']);
+    remote_rsync_remote($options['File'], $prod_path);
 }
 
 /**
