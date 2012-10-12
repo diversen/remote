@@ -5,11 +5,16 @@
  */
 function remote_move_file_to_remote($options){
 
-    $prod_path = mainCli::$ini['remote']['prod_path'];
-    if (!isset($options['File'])){
-        cos_cli_abort('You need to specify file to move');
+    if (!isset($options['source'])){
+        cos_cli_abort('You need to specify locale path to move');
     }
-    remote_rsync_remote($options['File'], $prod_path);
+    
+    $prod_path = mainCli::$ini['remote']['prod_path'];
+    if (isset($options['dest'])) {
+        $prod_path.= "/$options[dest]";
+    }
+    //echo $prod_path; die;
+    remote_rsync_remote($options['source'], $prod_path);
 }
 
 /**
@@ -153,6 +158,9 @@ function remote_rsync_remote ($locale_path, $prod_path) {
         mainCli::$ini['remote']['ssh_user'] = getenv('USER');
     }
 
+    //echo $locale_path;
+    //echo $prod_path;
+    //die;
     $command = "rsync -e 'ssh -p " . mainCli::$ini['remote']['ssh_port'] . "' -avl ";
     $command.= "$locale_path "; // move all except hidden files
     $command.=
@@ -259,7 +267,13 @@ mainCli::setOption('remote_fetch_files', array(
 ));
 
 mainCli::setArgument(
-    'File',
-    array('description'=> 'Specify single file to be moved',
+    'source',
+    array('description'=> 'Specify optional source path',
+        'optional' => true,
+));
+
+mainCli::setArgument(
+    'dest',
+    array('description'=> 'Specify optional destination path',
         'optional' => true,
 ));
