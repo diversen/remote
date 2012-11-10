@@ -88,7 +88,7 @@ function remote_sudo_system ($exec_command) {
 
 function remote_fetch_files ($options) {
     $archive = "./backup/files/latest.tar.gz";
-    $command = "./coscli.sh backup --files-backup $archive ";
+    $command = "./coscli.sh backup --public $archive ";
     
     cos_cli_print('Connecting to remote ssh server. Will create archive ...');
     remote_sudo_system($command);
