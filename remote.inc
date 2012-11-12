@@ -216,7 +216,7 @@ function remote_move_to_locale(){
 
     $command = "./coscli.sh db --dump-db-file ./backup/sql/latest.sql;";
     remote_system($command);
-    chmod_files_to_owner();
+    //chmod_files_to_owner();
     
     $remote_path = mainCli::$ini['remote']['prod_path'] . "/*";
     $locale_path = ".";
