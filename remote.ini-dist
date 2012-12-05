@@ -1,6 +1,10 @@
-;currenct console user will be used is user is not set
-;ssh_user = 'root'
-ssh_port = 12312
-ssh_host = 123.123.123.123
-prod_path = /home/dennis/www/www.coscms.org
-locale_path = /home/dennis/www/coscms
+; use port
+ssh_port = 22
+; use host or IP
+ssh_host = "lamp.test.org"
+; remote user
+ssh_user = 'dennis'
+; remote production path
+prod_path = "/home/remote/www/lamp.test.org"
+; locale path
+locale_path = "/home/dennis/www/coscms"
