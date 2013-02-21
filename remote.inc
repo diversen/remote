@@ -1,5 +1,6 @@
 <?php
 
+
 /**
  * rsync locale path with remote server
  */
@@ -197,6 +198,7 @@ function remote_load_locale(){
     load_db_file(array('File' => './backup/sql/latest.sql'));
 }
 
+
 /**
  * 
  * moving remote files to locale via ssh and rsync
@@ -226,6 +228,20 @@ function remote_move_to_locale(){
     chmod_files();
 }
 
+
+/**
+ * function for creating latest dump,
+ *          moving remote dump from remote to locale via ssh server.
+ *
+ * @return int  $ret value from exec command
+ */
+  
+function remote_connect(){
+    //echo mainCli::$ini['remote']['ssh_port'];
+    echo config::getModuleIni('ssh_port');
+}
+
+
 mainCli::setCommand('remote', array(
     'description' => "Commands for moving files between servers using rsync and ssh. ",
 ));
@@ -235,6 +251,15 @@ mainCli::setOption('remote_move_to_remote', array(
     'description' => 'Will push complete source tree to remote ssh server',
     'action'      => 'StoreTrue'
 ));
+
+// test
+/*
+mainCli::setOption('remote_connect', array(
+    'long_name'   => '--connect',
+    'description' => 'Will connect to remote server through ssh',
+    'action'      => 'StoreTrue'
+)); */
+
 
 mainCli::setOption('remote_move_file_to_remote', array(
     'long_name'   => '--single-push',
