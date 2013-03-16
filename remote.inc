@@ -235,10 +235,9 @@ function remote_move_to_locale(){
  *
  * @return int  $ret value from exec command
  */
-  
+ 
 function remote_connect(){
-    //echo mainCli::$ini['remote']['ssh_port'];
-    echo config::getModuleIni('ssh_port');
+    echo config::getModuleIni('prod_path');
 }
 
 
@@ -258,7 +257,7 @@ mainCli::setOption('remote_connect', array(
     'long_name'   => '--connect',
     'description' => 'Will connect to remote server through ssh',
     'action'      => 'StoreTrue'
-)); */
+)); */ 
 
 
 mainCli::setOption('remote_move_file_to_remote', array(
