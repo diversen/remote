@@ -87,6 +87,10 @@ function remote_sudo_system ($exec_command) {
     passthru($command);  
 }
 
+/**
+ * fetch latest files from production and move them to locale
+ * @param array $options
+ */
 function remote_fetch_files ($options) {
     $archive = "./backup/files/latest.tar.gz";
     $command = "sudo ./coscli.sh backup --public $archive ";
