@@ -1,7 +1,7 @@
 <?php
 
 // first we set a version for our module Note it has to be a float!
-$_INSTALL['VERSION'] = 2.3;
+$_INSTALL['VERSION'] = 2.41;
 
 // we specify that it is a shell module.
 // this means that the source files will be loaded when the base shell
