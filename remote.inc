@@ -163,7 +163,12 @@ function remote_rsync_remote ($locale_path, $prod_path) {
         mainCli::$ini['remote']['ssh_user'] = getenv('USER');
     }
 
-    $command = "rsync -e 'ssh -p " . mainCli::$ini['remote']['ssh_port'] . "' -avl --delete ";
+    $command = "rsync -e 'ssh -p " . mainCli::$ini['remote']['ssh_port'] . "' -avl ";
+    
+    if (!config::getMainIni('remote_no_delete')) {
+        $command.= "--delete "; 
+    }
+
     
     // exclude logs and public files
     $push_exclude = _COS_MOD_PATH . "/remote/push_exclude.ini";
@@ -250,9 +255,19 @@ function remote_connect(){
     echo config::getModuleIni('prod_path');
 }
 
+function remote_no_delete ($options = array ()) {
+    config::setMainIni('remote_no_delete', 1);
+}
+
 
 mainCli::setCommand('remote', array(
     'description' => "Commands for moving files between servers using rsync and ssh. ",
+));
+
+mainCli::setOption('remote_no_delete', array(
+    'long_name'   => '--no-delete',
+    'description' => 'Will fetch remote htdocs/files and extract to locale',
+    'action'      => 'StoreTrue'
 ));
 
 mainCli::setOption('remote_move_to_remote', array(
@@ -299,6 +314,8 @@ mainCli::setOption('remote_fetch_files', array(
     'description' => 'Will fetch remote htdocs/files and extract to locale',
     'action'      => 'StoreTrue'
 ));
+
+
 
 mainCli::setArgument(
     'source',

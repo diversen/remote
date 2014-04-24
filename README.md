@@ -9,6 +9,15 @@ Use:
 
 For all sub commands
 
+The idea is that on your `dev` server` you will be able to push complete site 
+to the `stage or the `prod` server. Be carefull as the push command will delete 
+files on prod site which is not in the development site. So when pushing
+it will mirror files on dev server with the one on production or stage server. 
+
+To prevent deletion, use: 
+
+    --no-delete
+
 ### Exlucde files
 
 copy rsyn_exclude.ini-dist to rsync_eclude.ini and add files: 
