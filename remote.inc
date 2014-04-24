@@ -163,16 +163,18 @@ function remote_rsync_remote ($locale_path, $prod_path) {
         mainCli::$ini['remote']['ssh_user'] = getenv('USER');
     }
 
-    //echo $locale_path;
-    //echo $prod_path;
-    //die;
     $command = "rsync -e 'ssh -p " . mainCli::$ini['remote']['ssh_port'] . "' -avl ";
+    
+    // exclude logs and public files
+    $command.= "--exclude '$locale_path/logs/*' --exclude '$locale_path/htdocs/files/*' ";
     $command.= "$locale_path "; // move all except hidden files
     $command.=
         mainCli::$ini['remote']['ssh_user'] . "@" .
         mainCli::$ini['remote']['ssh_host'] . ":" .
         $prod_path;
+    $ret = 1;
     passthru($command, $ret);
+    return $ret;
 }
 
 /**
