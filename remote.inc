@@ -266,7 +266,7 @@ mainCli::setCommand('remote', array(
 
 mainCli::setOption('remote_no_delete', array(
     'long_name'   => '--no-delete',
-    'description' => 'Will fetch remote htdocs/files and extract to locale',
+    'description' => 'Will prevent deletion of files when pushing source',
     'action'      => 'StoreTrue'
 ));
 
