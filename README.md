@@ -9,6 +9,14 @@ Use:
 
 For all sub commands
 
+### Exlucde files
+
+copy rsyn_exclude.ini-dist to rsync_eclude.ini and add files: 
+defaults to 
+
+    logs/*
+    htdocs/files/*
+
 ### Configuration
 
 	; use port
