@@ -1,6 +1,6 @@
-; use port
+; remote port
 ssh_port = 22
-; use host or IP
+; remote host or IP
 ssh_host = "lamp.test.org"
 ; remote user
 ssh_user = 'dennis'

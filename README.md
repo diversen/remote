@@ -18,6 +18,9 @@ To prevent deletion, use:
 
     --no-delete
 
+By default `logs/*` and `files/*` will not be deleted as they are excluded.  
+You can edit `push_exclude.ini` and add files which should be excluded.  
+
 ### Exlucde files
 
 copy rsyn_exclude.ini-dist to rsync_eclude.ini and add files: 
