@@ -242,7 +242,7 @@ function remote_move_to_locale(){
     remote_rsync_locale($remote_path, $locale_path);
 
     load_db_file(array('File' => './backup/sql/latest.sql'));
-    chmod_files();
+    cos_chmod_files();
 }
 
 
