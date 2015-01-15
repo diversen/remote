@@ -263,7 +263,7 @@ function remote_no_delete ($options = array ()) {
 
 
 mainCli::setCommand('remote', array(
-    'description' => "Commands for moving files between servers using rsync and ssh. ",
+    'description' => "Deploy install using Rsync and SSH",
 ));
 
 mainCli::setOption('remote_no_delete', array(
