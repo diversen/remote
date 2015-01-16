@@ -10,7 +10,7 @@ function remote_move_file_to_remote($options){
         cos_cli_abort('You need to specify locale path to move');
     }
     
-    $prod_path = mainCli::$ini['remote']['prod_path'];
+    $prod_path = self::$ini['remote']['prod_path'];
     if (isset($options['dest'])) {
         $prod_path.= "/$options[dest]";
     }
@@ -24,7 +24,7 @@ function remote_move_file_to_remote($options){
  * @return int  value from exec command
  */
 function remote_move_to_remote(){
-    $prod_path = mainCli::$ini['remote']['prod_path'];
+    $prod_path = self::$ini['remote']['prod_path'];
     $locale_path = ".";
     remote_rsync_remote($locale_path, $prod_path);
 }
@@ -37,7 +37,7 @@ function remote_move_to_remote(){
 function remote_move_to_remote_latest_dump(){
     $command = "./coscli.sh db --dump-db-file ./backup/sql/latest.sql"; 
     cos_exec($command);
-    $prod_path = mainCli::$ini['remote']['prod_path'] . "/backup/sql/latest.sql";
+    $prod_path = self::$ini['remote']['prod_path'] . "/backup/sql/latest.sql";
     $locale_path = "./backup/sql/latest.sql";
     remote_rsync_remote($locale_path, $prod_path);
 }
@@ -73,15 +73,15 @@ function remote_rm_files_remote(){
  * @param string $exec_command 
  */
 function remote_sudo_system ($exec_command) {
-    if (empty(mainCli::$ini['remote']['ssh_user'])){
-        mainCli::$ini['remote']['ssh_user'] = getenv('USER');
+    if (empty(self::$ini['remote']['ssh_user'])){
+        self::$ini['remote']['ssh_user'] = getenv('USER');
     }
     
-    $command = 'ssh -p' . mainCli::$ini['remote']['ssh_port'] . ' -t ';
-    $command.= mainCli::$ini['remote']['ssh_user'] . '@';
-    $command.= mainCli::$ini['remote']['ssh_host'] . ' ';
+    $command = 'ssh -p' . self::$ini['remote']['ssh_port'] . ' -t ';
+    $command.= self::$ini['remote']['ssh_user'] . '@';
+    $command.= self::$ini['remote']['ssh_host'] . ' ';
     $command.= '"';
-    $command.= "cd " . mainCli::$ini['remote']['prod_path'] . " && ";
+    $command.= "cd " . self::$ini['remote']['prod_path'] . " && ";
     $command.= $exec_command;
     $command.= '"';
     passthru($command);  
@@ -98,13 +98,13 @@ function remote_fetch_files ($options) {
     cos_cli_print('Connecting to remote ssh server. Will create archive ...');
     remote_sudo_system($command);
     
-    $user = mainCli::$ini['remote']['ssh_user'];
+    $user = self::$ini['remote']['ssh_user'];
     $command = "sudo chown $user:$user $archive";
     
     cos_cli_print('Connecting to remote ssh server. Will chown of archive ...');
     remote_sudo_system($command);
     
-    $remote_path = mainCli::$ini['remote']['prod_path'];
+    $remote_path = self::$ini['remote']['prod_path'];
     $remote_path.= "/backup/files/latest.tar.gz";
     $locale_path = "./backup/files/latest.tar.gz";
     
@@ -121,15 +121,15 @@ function remote_fetch_files ($options) {
  * @param string $exec_command 
  */
 function remote_system ($exec_command) {
-    if (empty(mainCli::$ini['remote']['ssh_user'])){
-        mainCli::$ini['remote']['ssh_user'] = getenv('USER');
+    if (empty(self::$ini['remote']['ssh_user'])){
+        self::$ini['remote']['ssh_user'] = getenv('USER');
     }
     
-    $command = 'ssh -p' . mainCli::$ini['remote']['ssh_port'] . ' ';
-    $command.= mainCli::$ini['remote']['ssh_user'] . '@';
-    $command.= mainCli::$ini['remote']['ssh_host'] . ' ';
+    $command = 'ssh -p' . self::$ini['remote']['ssh_port'] . ' ';
+    $command.= self::$ini['remote']['ssh_user'] . '@';
+    $command.= self::$ini['remote']['ssh_host'] . ' ';
     $command.= '"';
-    $command.= "cd " . mainCli::$ini['remote']['prod_path'] . " && ";
+    $command.= "cd " . self::$ini['remote']['prod_path'] . " && ";
     $command.= $exec_command;
     $command.= '"';
     $ret = cos_system($command);
@@ -142,13 +142,13 @@ function remote_system ($exec_command) {
  * @param type $locale_path 
  */
 function remote_rsync_locale ($remote_path, $locale_path) {
-    if (empty(mainCli::$ini['remote']['ssh_user'])){
-        mainCli::$ini['remote']['ssh_user'] = getenv('USER');
+    if (empty(self::$ini['remote']['ssh_user'])){
+        self::$ini['remote']['ssh_user'] = getenv('USER');
     }
     
-    $command = "rsync -e 'ssh -p " . mainCli::$ini['remote']['ssh_port'] . "' -avl ";
-    $command.= mainCli::$ini['remote']['ssh_user'] . "@";
-    $command.= mainCli::$ini['remote']['ssh_host'] . ":";
+    $command = "rsync -e 'ssh -p " . self::$ini['remote']['ssh_port'] . "' -avl ";
+    $command.= self::$ini['remote']['ssh_user'] . "@";
+    $command.= self::$ini['remote']['ssh_host'] . ":";
     $command.= "$remote_path $locale_path";
     passthru($command);
 }
@@ -159,11 +159,11 @@ function remote_rsync_locale ($remote_path, $locale_path) {
  */
 function remote_rsync_remote ($locale_path, $prod_path) {
       
-    if (empty(mainCli::$ini['remote']['ssh_user'])){
-        mainCli::$ini['remote']['ssh_user'] = getenv('USER');
+    if (empty(self::$ini['remote']['ssh_user'])){
+        self::$ini['remote']['ssh_user'] = getenv('USER');
     }
 
-    $command = "rsync -e 'ssh -p " . mainCli::$ini['remote']['ssh_port'] . "' -avl ";
+    $command = "rsync -e 'ssh -p " . self::$ini['remote']['ssh_port'] . "' -avl ";
     
     if (!config::getMainIni('remote_no_delete')) {
         $command.= "--delete "; 
@@ -180,8 +180,8 @@ function remote_rsync_remote ($locale_path, $prod_path) {
     
     $command.= "$locale_path "; // move all except hidden files
     $command.=
-        mainCli::$ini['remote']['ssh_user'] . "@" .
-        mainCli::$ini['remote']['ssh_host'] . ":" .
+        self::$ini['remote']['ssh_user'] . "@" .
+        self::$ini['remote']['ssh_host'] . ":" .
         $prod_path;
     $ret = 1;
     passthru($command, $ret);
@@ -196,8 +196,8 @@ function remote_rsync_remote ($locale_path, $prod_path) {
  */
 function remote_load_locale(){
 
-    if (empty(mainCli::$ini['remote']['ssh_user'])){
-        mainCli::$ini['remote']['ssh_user'] = getenv('USER');
+    if (empty(self::$ini['remote']['ssh_user'])){
+        self::$ini['remote']['ssh_user'] = getenv('USER');
     }
 
     // require confirm
@@ -208,7 +208,7 @@ function remote_load_locale(){
     $command = "./coscli.sh db --dump-db-file ./backup/sql/latest.sql";    
     remote_system($command);
 
-    $remote_path = mainCli::$ini['remote']['prod_path'] . "/backup/sql/latest.sql";
+    $remote_path = self::$ini['remote']['prod_path'] . "/backup/sql/latest.sql";
     $locale_path = "./backup/sql/latest.sql";
     
     remote_rsync_locale($remote_path, $locale_path);
@@ -224,8 +224,8 @@ function remote_load_locale(){
  * @return int  value from exec command
  */
 function remote_move_to_locale(){
-    if (empty(mainCli::$ini['remote']['ssh_user'])){
-        mainCli::$ini['remote']['ssh_user'] = getenv('USER');
+    if (empty(self::$ini['remote']['ssh_user'])){
+        self::$ini['remote']['ssh_user'] = getenv('USER');
     }
 
     // confirm
@@ -237,7 +237,7 @@ function remote_move_to_locale(){
     remote_system($command);
     //chmod_files_to_owner();
     
-    $remote_path = mainCli::$ini['remote']['prod_path'] . "/*";
+    $remote_path = self::$ini['remote']['prod_path'] . "/*";
     $locale_path = ".";
     remote_rsync_locale($remote_path, $locale_path);
 
@@ -262,17 +262,17 @@ function remote_no_delete ($options = array ()) {
 }
 
 
-mainCli::setCommand('remote', array(
+self::setCommand('remote', array(
     'description' => "Deploy install using Rsync and SSH",
 ));
 
-mainCli::setOption('remote_no_delete', array(
+self::setOption('remote_no_delete', array(
     'long_name'   => '--no-delete',
     'description' => 'Will prevent deletion of files when pushing source',
     'action'      => 'StoreTrue'
 ));
 
-mainCli::setOption('remote_move_to_remote', array(
+self::setOption('remote_move_to_remote', array(
     'long_name'   => '--push',
     'description' => 'Will push complete source tree to remote ssh server',
     'action'      => 'StoreTrue'
@@ -287,31 +287,31 @@ mainCli::setOption('remote_connect', array(
 )); */ 
 
 
-mainCli::setOption('remote_move_file_to_remote', array(
+self::setOption('remote_move_file_to_remote', array(
     'long_name'   => '--single-push',
     'description' => 'Will move single specified file to remote ssh server',
     'action'      => 'StoreTrue'
 ));
 
-mainCli::setOption('remote_load_remote', array(
+self::setOption('remote_load_remote', array(
     'long_name'   => '--load-remote',
     'description' => 'Will load latest dump onto production server',
     'action'      => 'StoreTrue'
 ));
 
-mainCli::setOption('remote_move_to_locale', array(
+self::setOption('remote_move_to_locale', array(
     'long_name'   => '--pull',
     'description' => 'Will pull complete source tree and files to locale server',
     'action'      => 'StoreTrue'
 ));
 
-mainCli::setOption('remote_load_locale', array(
+self::setOption('remote_load_locale', array(
     'long_name'   => '--load-locale',
     'description' => 'Will get and load latest dump from production to locale server',
     'action'      => 'StoreTrue'
 ));
 
-mainCli::setOption('remote_fetch_files', array(
+self::setOption('remote_fetch_files', array(
     'long_name'   => '--fetch-files',
     'description' => 'Will fetch remote htdocs/files and extract to locale',
     'action'      => 'StoreTrue'
@@ -319,13 +319,13 @@ mainCli::setOption('remote_fetch_files', array(
 
 
 
-mainCli::setArgument(
+self::setArgument(
     'source',
     array('description'=> 'Specify optional source path',
         'optional' => true,
 ));
 
-mainCli::setArgument(
+self::setArgument(
     'dest',
     array('description'=> 'Specify optional destination path',
         'optional' => true,
