@@ -263,7 +263,7 @@ function remote_no_delete ($options = array ()) {
 
 
 mainCli::setCommand('remote', array(
-    'description' => "Commands for moving files between servers using rsync and ssh. ",
+    'description' => "Move files between servers using rsync and ssh. ",
 ));
 
 mainCli::setOption('remote_no_delete', array(
@@ -330,3 +330,4 @@ mainCli::setArgument(
     array('description'=> 'Specify optional destination path',
         'optional' => true,
 ));
+
