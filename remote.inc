@@ -165,7 +165,7 @@ function remote_rsync_remote ($locale_path, $prod_path) {
 
     $command = "rsync -e 'ssh -p " . mainCli::$ini['remote']['ssh_port'] . "' -avl ";
     
-    if (!config::getMainIni('remote_no_delete')) {
+    if (!conf::getMainIni('remote_no_delete')) {
         $command.= "--delete "; 
     }
 
@@ -254,11 +254,11 @@ function remote_move_to_locale(){
  */
  
 function remote_connect(){
-    echo config::getModuleIni('prod_path');
+    echo conf::getModuleIni('prod_path');
 }
 
 function remote_no_delete ($options = array ()) {
-    config::setMainIni('remote_no_delete', 1);
+    conf::setMainIni('remote_no_delete', 1);
 }
 
 
