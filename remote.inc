@@ -171,7 +171,7 @@ function remote_rsync_remote ($locale_path, $prod_path) {
 
     
     // exclude logs and public files
-    $push_exclude = _COS_MOD_PATH . "/remote/push_exclude.ini";
+    $push_exclude = conf::pathModules() . "/remote/push_exclude.ini";
     if (!file_exists($push_exclude)) {
         copy($push_exclude . "-dist", $push_exclude);
     }
