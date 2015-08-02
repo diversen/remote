@@ -1,5 +1,6 @@
 <?php
 
+use diversen\conf;
 
 /**
  * rsync locale path with remote server
@@ -10,7 +11,7 @@ function remote_move_file_to_remote($options){
         cos_cli_abort('You need to specify locale path to move');
     }
     
-    $prod_path = mainCli::$ini['remote']['prod_path'];
+    $prod_path = conf::getModuleIni('prod_path');
     if (isset($options['dest'])) {
         $prod_path.= "/$options[dest]";
     }
@@ -24,7 +25,7 @@ function remote_move_file_to_remote($options){
  * @return int  value from exec command
  */
 function remote_move_to_remote(){
-    $prod_path = mainCli::$ini['remote']['prod_path'];
+    $prod_path = conf::getModuleIni('prod_path');
     $locale_path = ".";
     remote_rsync_remote($locale_path, $prod_path);
 }
@@ -37,7 +38,7 @@ function remote_move_to_remote(){
 function remote_move_to_remote_latest_dump(){
     $command = "./coscli.sh db --dump-db-file ./backup/sql/latest.sql"; 
     cos_exec($command);
-    $prod_path = mainCli::$ini['remote']['prod_path'] . "/backup/sql/latest.sql";
+    $prod_path = conf::getModuleIni('prod_path') . "/backup/sql/latest.sql";
     $locale_path = "./backup/sql/latest.sql";
     remote_rsync_remote($locale_path, $prod_path);
 }
@@ -73,15 +74,13 @@ function remote_rm_files_remote(){
  * @param string $exec_command 
  */
 function remote_sudo_system ($exec_command) {
-    if (empty(mainCli::$ini['remote']['ssh_user'])){
-        mainCli::$ini['remote']['ssh_user'] = getenv('USER');
-    }
+    $ssh_user = remote_get_user();
     
-    $command = 'ssh -p' . mainCli::$ini['remote']['ssh_port'] . ' -t ';
-    $command.= mainCli::$ini['remote']['ssh_user'] . '@';
-    $command.= mainCli::$ini['remote']['ssh_host'] . ' ';
+    $command = 'ssh -p' . conf::getModuleIni('ssh_port') . ' -t ';
+    $command.= $ssh_user . '@';
+    $command.= config::getModuleIni('ssh_host') . ' ';
     $command.= '"';
-    $command.= "cd " . mainCli::$ini['remote']['prod_path'] . " && ";
+    $command.= "cd " . conf::getModuleIni('prod_path') . " && ";
     $command.= $exec_command;
     $command.= '"';
     passthru($command);  
@@ -98,13 +97,13 @@ function remote_fetch_files ($options) {
     cos_cli_print('Connecting to remote ssh server. Will create archive ...');
     remote_sudo_system($command);
     
-    $user = mainCli::$ini['remote']['ssh_user'];
+    $ssh_user = remote_get_user();
     $command = "sudo chown $user:$user $archive";
     
     cos_cli_print('Connecting to remote ssh server. Will chown of archive ...');
     remote_sudo_system($command);
     
-    $remote_path = mainCli::$ini['remote']['prod_path'];
+    $remote_path = conf::getModuleIni('prod_path');
     $remote_path.= "/backup/files/latest.tar.gz";
     $locale_path = "./backup/files/latest.tar.gz";
     
@@ -121,15 +120,13 @@ function remote_fetch_files ($options) {
  * @param string $exec_command 
  */
 function remote_system ($exec_command) {
-    if (empty(mainCli::$ini['remote']['ssh_user'])){
-        mainCli::$ini['remote']['ssh_user'] = getenv('USER');
-    }
+    $ssh_user = remote_get_user();
     
-    $command = 'ssh -p' . mainCli::$ini['remote']['ssh_port'] . ' ';
-    $command.= mainCli::$ini['remote']['ssh_user'] . '@';
-    $command.= mainCli::$ini['remote']['ssh_host'] . ' ';
+    $command = 'ssh -p' . conf::getModuleIni('ssh_port') . ' ';
+    $command.= $ssh_user . '@';
+    $command.= conf::getModuleIni('ssh_host') . ' ';
     $command.= '"';
-    $command.= "cd " . mainCli::$ini['remote']['prod_path'] . " && ";
+    $command.= "cd " . conf::getModuleIni('prod_path') . " && ";
     $command.= $exec_command;
     $command.= '"';
     $ret = cos_system($command);
@@ -142,15 +139,21 @@ function remote_system ($exec_command) {
  * @param type $locale_path 
  */
 function remote_rsync_locale ($remote_path, $locale_path) {
-    if (empty(mainCli::$ini['remote']['ssh_user'])){
-        mainCli::$ini['remote']['ssh_user'] = getenv('USER');
-    }
+    $ssh_user = remote_get_user();
     
-    $command = "rsync -e 'ssh -p " . mainCli::$ini['remote']['ssh_port'] . "' -avl ";
-    $command.= mainCli::$ini['remote']['ssh_user'] . "@";
-    $command.= mainCli::$ini['remote']['ssh_host'] . ":";
+    $command = "rsync -e 'ssh -p " . conf::getModuleIni('ssh_port') . "' -avl ";
+    $command.= $ssh_user . "@";
+    $command.= conf::getModuleIni('ssh_host') . ":";
     $command.= "$remote_path $locale_path";
     passthru($command);
+}
+
+function remote_get_user () {
+    $ssh_user = conf::getModuleIni('ssh_user');
+    if (empty($ssh_user)) {
+        $ssh_user = getenv('USER');
+    }
+    return $ssh_user;
 }
 
 /**
@@ -158,12 +161,9 @@ function remote_rsync_locale ($remote_path, $locale_path) {
  * @param string $locale_path the path to rsync 
  */
 function remote_rsync_remote ($locale_path, $prod_path) {
-      
-    if (empty(mainCli::$ini['remote']['ssh_user'])){
-        mainCli::$ini['remote']['ssh_user'] = getenv('USER');
-    }
+    $ssh_user = remote_get_user();
 
-    $command = "rsync -e 'ssh -p " . mainCli::$ini['remote']['ssh_port'] . "' -avl ";
+    $command = "rsync -e 'ssh -p " . conf::getModuleIni('ssh_port') . "' -avl ";
     
     if (!conf::getMainIni('remote_no_delete')) {
         $command.= "--delete "; 
@@ -176,12 +176,11 @@ function remote_rsync_remote ($locale_path, $prod_path) {
         copy($push_exclude . "-dist", $push_exclude);
     }
     
-    $command.= "--exclude-from '$push_exclude' ";
-    
+    $command.= "--exclude-from '$push_exclude' ";    
     $command.= "$locale_path "; // move all except hidden files
     $command.=
-        mainCli::$ini['remote']['ssh_user'] . "@" .
-        mainCli::$ini['remote']['ssh_host'] . ":" .
+        $ssh_user . "@" .
+        conf::getModuleIni('ssh_host') . ":" .
         $prod_path;
     $ret = 1;
     passthru($command, $ret);
@@ -196,10 +195,6 @@ function remote_rsync_remote ($locale_path, $prod_path) {
  */
 function remote_load_locale(){
 
-    if (empty(mainCli::$ini['remote']['ssh_user'])){
-        mainCli::$ini['remote']['ssh_user'] = getenv('USER');
-    }
-
     // require confirm
     if (!cos_confirm_readline('Locale database will be destroyed ')){
         exit(1);
@@ -208,7 +203,7 @@ function remote_load_locale(){
     $command = "./coscli.sh db --dump-db-file ./backup/sql/latest.sql";    
     remote_system($command);
 
-    $remote_path = mainCli::$ini['remote']['prod_path'] . "/backup/sql/latest.sql";
+    $remote_path = conf::getModuleIni('prod_path') . "/backup/sql/latest.sql";
     $locale_path = "./backup/sql/latest.sql";
     
     remote_rsync_locale($remote_path, $locale_path);
@@ -224,9 +219,6 @@ function remote_load_locale(){
  * @return int  value from exec command
  */
 function remote_move_to_locale(){
-    if (empty(mainCli::$ini['remote']['ssh_user'])){
-        mainCli::$ini['remote']['ssh_user'] = getenv('USER');
-    }
 
     // confirm
     if (!cos_confirm_readline('Locale source will be overwritten. Locale database overwritten with remote ')){
@@ -235,9 +227,8 @@ function remote_move_to_locale(){
 
     $command = "./coscli.sh db --dump-db-file ./backup/sql/latest.sql;";
     remote_system($command);
-    //chmod_files_to_owner();
     
-    $remote_path = mainCli::$ini['remote']['prod_path'] . "/*";
+    $remote_path = conf::getModuleIni('prod_path') . "/*";
     $locale_path = ".";
     remote_rsync_locale($remote_path, $locale_path);
 
