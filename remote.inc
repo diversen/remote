@@ -1,6 +1,7 @@
 <?php
 
 use diversen\conf;
+use diversen\cli\common;
 
 /**
  * rsync locale path with remote server
@@ -8,7 +9,7 @@ use diversen\conf;
 function remote_move_file_to_remote($options){
 
     if (!isset($options['source'])){
-        cos_cli_abort('You need to specify locale path to move');
+        common::abort('You need to specify locale path to move');
     }
     
     $prod_path = conf::getModuleIni('prod_path');
@@ -37,7 +38,7 @@ function remote_move_to_remote(){
  */
 function remote_move_to_remote_latest_dump(){
     $command = "./coscli.sh db --dump-db-file ./backup/sql/latest.sql"; 
-    cos_exec($command);
+    common::execCommand($command);
     $prod_path = conf::getModuleIni('prod_path') . "/backup/sql/latest.sql";
     $locale_path = "./backup/sql/latest.sql";
     remote_rsync_remote($locale_path, $prod_path);
@@ -94,23 +95,23 @@ function remote_fetch_files ($options) {
     $archive = "./backup/files/latest.tar.gz";
     $command = "sudo ./coscli.sh backup --public $archive ";
     
-    cos_cli_print('Connecting to remote ssh server. Will create archive ...');
+    common::echoMessage('Connecting to remote ssh server. Will create archive ...');
     remote_sudo_system($command);
     
     $ssh_user = remote_get_user();
     $command = "sudo chown $user:$user $archive";
     
-    cos_cli_print('Connecting to remote ssh server. Will chown of archive ...');
+    common::echoMessage('Connecting to remote ssh server. Will chown of archive ...');
     remote_sudo_system($command);
     
     $remote_path = conf::getModuleIni('prod_path');
     $remote_path.= "/backup/files/latest.tar.gz";
     $locale_path = "./backup/files/latest.tar.gz";
     
-    cos_cli_print('Fetching remote archive with rsync  ...');
+    common::echoMessage('Fetching remote archive with rsync  ...');
     remote_rsync_locale($remote_path, $locale_path);
     
-    cos_cli_print('Extracting rsynced archive with tar  ...');
+    common::echoMessage('Extracting rsynced archive with tar  ...');
     backup_files_restore(array ('File' => $archive));
 }
 
@@ -129,7 +130,7 @@ function remote_system ($exec_command) {
     $command.= "cd " . conf::getModuleIni('prod_path') . " && ";
     $command.= $exec_command;
     $command.= '"';
-    $ret = cos_system($command);
+    $ret = common::systemExec($command);
     return $ret;
 }
 
@@ -196,7 +197,7 @@ function remote_rsync_remote ($locale_path, $prod_path) {
 function remote_load_locale(){
 
     // require confirm
-    if (!cos_confirm_readline('Locale database will be destroyed ')){
+    if (!common::readlineConfirm('Locale database will be destroyed ')){
         exit(1);
     }
 
@@ -221,7 +222,7 @@ function remote_load_locale(){
 function remote_move_to_locale(){
 
     // confirm
-    if (!cos_confirm_readline('Locale source will be overwritten. Locale database overwritten with remote ')){
+    if (!common::readlineConfirm('Locale source will be overwritten. Locale database overwritten with remote ')){
         exit(1);
     }
 
