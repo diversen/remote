@@ -130,7 +130,7 @@ function remote_system ($exec_command) {
     $command.= "cd " . conf::getModuleIni('prod_path') . " && ";
     $command.= $exec_command;
     $command.= '"';
-    $ret = common::systemExec($command);
+    $ret = common::systemCommand($command);
     return $ret;
 }
 
