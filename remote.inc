@@ -3,11 +3,6 @@
 
 use diversen\conf;
 use diversen\cli\common;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * rsync locale path with remote server
@@ -259,18 +254,17 @@ function remote_no_delete ($options = array ()) {
     conf::setMainIni('remote_no_delete', 1);
 }
 
-
-mainCli::setCommand('remote', array(
+self::setCommand('remote', array(
     'description' => "Move files between servers using rsync and ssh. ",
 ));
 
-mainCli::setOption('remote_no_delete', array(
+self::setOption('remote_no_delete', array(
     'long_name'   => '--no-delete',
     'description' => 'Will prevent deletion of files when pushing source',
     'action'      => 'StoreTrue'
 ));
 
-mainCli::setOption('remote_move_to_remote', array(
+self::setOption('remote_move_to_remote', array(
     'long_name'   => '--push',
     'description' => 'Will push complete source tree to remote ssh server',
     'action'      => 'StoreTrue'
@@ -284,46 +278,43 @@ mainCli::setOption('remote_connect', array(
     'action'      => 'StoreTrue'
 )); */ 
 
-
-mainCli::setOption('remote_move_file_to_remote', array(
+self::setOption('remote_move_file_to_remote', array(
     'long_name'   => '--single-push',
     'description' => 'Will move single specified file to remote ssh server',
     'action'      => 'StoreTrue'
 ));
 
-mainCli::setOption('remote_load_remote', array(
+self::setOption('remote_load_remote', array(
     'long_name'   => '--load-remote',
     'description' => 'Will load latest dump onto production server',
     'action'      => 'StoreTrue'
 ));
 
-mainCli::setOption('remote_move_to_locale', array(
+self::setOption('remote_move_to_locale', array(
     'long_name'   => '--pull',
     'description' => 'Will pull complete source tree and files to locale server',
     'action'      => 'StoreTrue'
 ));
 
-mainCli::setOption('remote_load_locale', array(
+self::setOption('remote_load_locale', array(
     'long_name'   => '--load-locale',
     'description' => 'Will get and load latest dump from production to locale server',
     'action'      => 'StoreTrue'
 ));
 
-mainCli::setOption('remote_fetch_files', array(
+self::setOption('remote_fetch_files', array(
     'long_name'   => '--fetch-files',
     'description' => 'Will fetch remote htdocs/files and extract to locale',
     'action'      => 'StoreTrue'
 ));
 
-
-
-mainCli::setArgument(
+self::setArgument(
     'source',
     array('description'=> 'Specify optional source path',
         'optional' => true,
 ));
 
-mainCli::setArgument(
+self::setArgument(
     'dest',
     array('description'=> 'Specify optional destination path',
         'optional' => true,
